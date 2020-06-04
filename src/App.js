@@ -1,17 +1,64 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+import { fetchWeather } from './api/fetch-weather';
+
 function App() {
-    return (
-        <div className="app">
-            <header className="app-header">
-                <img src={logo} className="app-logo" alt="logo" />
-                <h4 className="app-title"> App Title</h4>
-            </header>
-            <main className="app-main"></main>
-        </div>
-    );
+  const [query, setQuery] = useState('');
+  const [weather, setWeather] = useState({});
+
+  const search = async (e) => {
+    if (e.key === 'Enter') {
+      const data = await fetchWeather(query);
+      setWeather(data);
+      setQuery('');
+    }
+
+    return;
+  };
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <img src={logo} className="app-logo" alt="logo" />
+        <h4 className="app-title">Weather App</h4>
+      </header>
+      <main className="main-container">
+        <input
+          type="text"
+          className="search"
+          placeholder="Search..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyPress={search}
+        />
+
+        {weather.main && (
+          <div className="city">
+            <h2 className="city-name">
+              <span>{weather.name}</span>
+              <sup>{weather.sys.country}</sup>
+            </h2>
+
+            <div className="city-temp">
+              {Math.round(weather.main.temp)}
+              <sup>&deg;C</sup>
+            </div>
+
+            <div className="info">
+              <img
+                className="city-icon"
+                src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
+                alt={weather.weather[0].description}
+              />
+              <p>{weather.weather[0].description}</p>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
 }
 
 export default App;
